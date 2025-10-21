@@ -1,0 +1,72 @@
+//=============================================
+//
+// ブロック処理 [ block.h ]
+// author chikada shouya
+//
+//=============================================
+
+#ifndef _BLOCK_H_
+#define _BLOCK_H_
+
+#include "main.h"
+
+//マクロ
+#define MAX_BLOCK (32)	//ブロックの最大数
+
+typedef enum
+{
+	BLOCKTYPE_0 = 0,	//長方形(無地) 0
+	BLOCKTYPE_GOAL,		//ゴール 1
+	BLOCKTYPE_TUTORIAL,	//チュートリアル 2
+	BLOCKTYPE_TUTORIAL1,	//チュートリアル1 3
+	BLOCKTYPE_KEYHOLE,	//鍵穴 4
+	BLOCKTYPE_MAX,
+}BLOCKTYPE;
+
+static const char* BLOCK_MODEL[BLOCKTYPE_MAX] =
+{
+	"data\\MODEL\\blockA.x",		//通常
+	"data\\MODEL\\trophy.x",		//ゴール
+	"data\\MODEL\\tutorial.x",		//チュートリアル
+	"data\\MODEL\\tutorial1.x",		//チュートリアル1
+	"data\\MODEL\\door.x",		//チュートリアル1
+
+};
+
+// ブロックモデルの構造体宣言
+typedef struct
+{
+	LPD3DXMESH pMesh; // メッシュ
+	LPD3DXBUFFER pBuffMat; // バッファ
+	DWORD dwNumMat; // マテリアル
+	LPDIRECT3DTEXTURE9 pTexture[BLOCKTYPE_MAX]; // テクスチャ
+}BlockModel;
+
+//ブロックの構造体
+typedef struct
+{
+	D3DXVECTOR3 pos;				//位置
+	D3DXVECTOR3 rot;				//向き
+	D3DXVECTOR3 move;				//移動
+	D3DXVECTOR3 size;				//サイズ
+	D3DXVECTOR3 vtxMin , vtxMax;	//頂点の最小最大
+	D3DXMATRIX mtxWorld;			//マトリックス
+	BLOCKTYPE nType;
+	bool bLanding;
+	bool bUse;
+	bool bMove;
+	BlockModel pModel;
+}BLOCK;
+
+
+//プロトタイプ宣言
+void InitBlock(void);
+void UninitBlock(void);
+void UpdateBlock(void);
+void DrawBlock(void);
+bool CollisionBlock(void);
+void SetBlock(D3DXVECTOR3 pos, D3DXVECTOR3 rot, BLOCKTYPE nType);
+BLOCK* GetBlock(void);
+bool IsGoal();
+bool IsBill();
+#endif

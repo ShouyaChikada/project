@@ -1,0 +1,234 @@
+//=================================================================
+//
+//
+//
+//				あ　い　て　む　処　理　！！
+//				Author: hirata ryusei
+//
+//
+//==================================================================
+#include "item.h"
+#include "player.h"
+#include "input.h"
+#include "sound.h"
+
+// グローバル変数宣言
+ITEM g_item[ITEMTYPE_MAX];
+
+//=================
+//	初期化処理
+//=================
+void Inititem(void)
+{
+	//	デバイスの取得
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+	D3DXMATERIAL* pMat;
+
+	for (int nCnt = 0; nCnt < ITEMTYPE_MAX; nCnt++)
+	{
+		//	Xファイルの読み込み
+		D3DXLoadMeshFromX(ITEM_MODEL[nCnt],
+			D3DXMESH_SYSTEMMEM,
+			pDevice,
+			NULL,
+			&g_item[nCnt].Iteminfo[nCnt].pBufferMat,
+			NULL,
+			&g_item[nCnt].Iteminfo[nCnt].dwNuMat,
+			&g_item[nCnt].Iteminfo[nCnt].pMesh);
+	}
+
+	for (int count = 0; count < ITEMTYPE_MAX; count++)
+	{
+		g_item[count].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+		g_item[count].nType = 0;
+		g_item[count].bUse = false;
+		g_item[count].bHave = false;
+		g_item[count].bHold = false;
+
+		//	テクスチャの読み込み
+		pMat = (D3DXMATERIAL*)g_item[count].Iteminfo[count].pBufferMat->GetBufferPointer();
+
+		for (int nCntMat = 0; nCntMat < (int)g_item[count].Iteminfo[count].dwNuMat; nCntMat++)
+		{
+			//	テクスチャの読み込み
+			if (pMat[nCntMat].pTextureFilename != NULL)
+			{
+				D3DXCreateTextureFromFile(pDevice,
+					pMat[nCntMat].pTextureFilename,
+					&g_item[count].Iteminfo[count].pTexture[nCntMat]);
+			}
+		}
+	}
+}
+
+//=================
+//	終了処理
+//=================
+void Uninititem(void)
+{
+	StopSound();
+
+	for (int count = 0; count < MAX_ITEM; count++)
+	{
+		for (int nCntMat = 0; nCntMat < (int)g_item[count].Iteminfo[count].dwNuMat; nCntMat++)
+		{
+			//	テクスチャの破棄
+			if (g_item[count].Iteminfo[count].pTexture[nCntMat] != NULL)
+			{
+				g_item[count].Iteminfo[count].pTexture[nCntMat]->Release();
+				g_item[count].Iteminfo[count].pTexture[nCntMat] = NULL;
+			}
+		}
+	}
+
+	for (int count = 0; count < MAX_ITEM; count++)
+	{
+		//	メッシュの破棄
+		if (g_item[count].Iteminfo[count].pMesh != NULL)
+		{
+			g_item[count].Iteminfo[count].pMesh->Release();
+			g_item[count].Iteminfo[count].pMesh = NULL;
+		}
+
+		//	マテリアルの破棄
+		if (g_item[count].Iteminfo[count].pBufferMat != NULL)
+		{
+			g_item[count].Iteminfo[count].pBufferMat->Release();
+			g_item[count].Iteminfo[count].pBufferMat = NULL;
+		}
+	}
+}
+
+//=================
+//	更新処理
+//=================
+void Updateitem(void)
+{
+	Player* pPlayer = GetPlayer();
+
+	for (int nCnt = 0; nCnt < MAX_ITEM; nCnt++)
+	{
+		if (g_item[nCnt].bUse == true)
+		{
+			//プレイヤーの半径の算出用変数
+			float fPRadPos = 28.0f;
+
+			//アイテムの半径の算出用変数
+			float fIRadPos = 28.0f;
+
+			//プレやーの位置を取得
+			D3DXVECTOR3 PlayerPos = GetPlayer()->pos;
+
+			//アイテムのプレイヤーの距離の差
+			D3DXVECTOR3 diff = PlayerPos - g_item[nCnt].pos;
+
+			//範囲計算
+			float fDisX = PlayerPos.x - g_item[nCnt].pos.x;
+			float fDisY = PlayerPos.y - g_item[nCnt].pos.y;
+			float fDisZ = PlayerPos.z - g_item[nCnt].pos.z;
+
+			//二つの半径を求める
+			float fRadX = fPRadPos + fIRadPos;
+
+			//プレイヤーがアイテムの範囲に入ったら
+			if ((fDisX * fDisX) + (fDisY * fDisY) + (fDisZ * fDisZ) <= (fRadX * fRadX))
+			{
+				if (KeybordTrigger(DIK_F) == true)
+				{//Fを押されたとき
+					PlaySound(SOUND_LABEL_SHOT02);
+					//アイテムを拾う
+					g_item[nCnt].bHave = true;
+					g_item[nCnt].bUse = false;
+					
+					//	脱出条件
+					if (g_item[nCnt].bUse == false && g_item[nCnt].nType == ITEMTYPE_ONE)
+					{
+						g_item[nCnt].bHold = true;
+					}
+					if(g_item[nCnt].bUse == false && g_item[nCnt].nType == ITEMTYPE_TWO)
+					{
+						g_item[nCnt].bHold = true;
+					}
+				}
+			}
+		}
+	}
+}
+
+//=================
+//	描画処理
+//=================
+void Drawitem(void)
+{
+	//	デバイスの取得
+	LPDIRECT3DDEVICE9 pDevice = GetDevice();
+
+	//	計算用
+	D3DXMATRIX mtxRot, mtxTrans;
+	D3DMATERIAL9 matDef;
+	D3DXMATERIAL* pMat;
+
+	for (int count = 0; count < ITEMTYPE_MAX; count++)
+	{
+		if (g_item[count].bUse == true)
+		{
+			int nType = g_item[count].nType;
+
+			//	ワールドマトリックスの初期化
+			D3DXMatrixIdentity(&g_item[count].mtxWorld);
+
+			//	位置の反映
+			D3DXMatrixTranslation(&mtxTrans, g_item[count].pos.x, g_item[count].pos.y, g_item[count].pos.z);
+			D3DXMatrixMultiply(&g_item[count].mtxWorld, &g_item[count].mtxWorld, &mtxTrans);
+
+			//	ワールドマトリックスの設定
+			pDevice->SetTransform(D3DTS_WORLD, &g_item[count].mtxWorld);
+
+			//	現在のマテリアルを保存
+			pDevice->GetMaterial(&matDef);
+
+			for (int nCntMat = 0; nCntMat < (int)g_item[count].Iteminfo[nType].dwNuMat; nCntMat++)
+			{
+				//	マテリアルデータへのポインタを取得
+				pMat = (D3DXMATERIAL*)g_item[count].Iteminfo[nType].pBufferMat->GetBufferPointer();
+
+				//	マテリアルの設定
+				pDevice->SetMaterial(&pMat[nCntMat].MatD3D);
+
+				//	テクスチャの設定
+				pDevice->SetTexture(0, g_item[count].Iteminfo[nType].pTexture[nCntMat]);
+
+				//	モデルの描画
+				g_item[count].Iteminfo[nType].pMesh->DrawSubset(nCntMat);
+			}
+
+		}
+		pDevice->SetMaterial(&matDef);
+
+	}
+}
+
+//=================
+//	取得処理
+//=================
+ITEM* Getitem(void)
+{
+	return &g_item[0];
+}
+
+//=================
+//	配置処理
+//=================
+void Setitem(D3DXVECTOR3 pos, int nType)
+{
+	for (int nCnt = 0; nCnt < ITEMTYPE_MAX; nCnt++)
+	{
+		if (g_item[nCnt].bUse == false)
+		{
+			g_item[nCnt].pos = pos;
+			g_item[nCnt].nType = nType;
+			g_item[nCnt].bUse = true;
+			break;
+		}
+	}
+}
