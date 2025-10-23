@@ -73,7 +73,7 @@ HRESULT CGrand::Init(void)
 
 	VERTEX_3D* pVtx = nullptr;
 
-	int radius = 500;	//îºåa
+	int radius = 1500;	//îºåa
 	int index = 0;
 	float fAngle = 0.0f;
 
@@ -81,7 +81,7 @@ HRESULT CGrand::Init(void)
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 
-	float fxz = 100.0f;
+	float fxz = 300.0f;
 
 	//í∏ì_ÇÃê›íË
 	for (int nCntZ = 0; nCntZ < GRAND_Z_BLOCK; nCntZ++)
@@ -91,15 +91,15 @@ HRESULT CGrand::Init(void)
 		{//Xï˚å¸ÇÃåJÇËï‘Çµ
 
 			//í∏ì_ç¿ïWÇÃê›íË
-			pVtx[0].pos = D3DXVECTOR3(-fxz, -50.0f, fxz);
-			pVtx[1].pos = D3DXVECTOR3(0.0f, -50.0f, fxz);
-			pVtx[2].pos = D3DXVECTOR3(fxz, -50.0f, fxz);
-			pVtx[3].pos = D3DXVECTOR3(-fxz, -50.0f, 0.0f);
-			pVtx[4].pos = D3DXVECTOR3(0.0f, -50.0f, 0.0f);
-			pVtx[5].pos = D3DXVECTOR3(fxz, -50.0f, 0.0f);
-			pVtx[6].pos = D3DXVECTOR3(-fxz, -50.0f, -fxz);
-			pVtx[7].pos = D3DXVECTOR3(0.0f, -50.0f, -fxz);
-			pVtx[8].pos = D3DXVECTOR3(fxz, -50.0f, -fxz);
+			pVtx[0].pos = D3DXVECTOR3(-fxz, 00.0f, fxz);
+			pVtx[1].pos = D3DXVECTOR3(0.0f, 0.0f, fxz);
+			pVtx[2].pos = D3DXVECTOR3(fxz, 0.0f, fxz);
+			pVtx[3].pos = D3DXVECTOR3(-fxz, 0.0f, 0.0f);
+			pVtx[4].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+			pVtx[5].pos = D3DXVECTOR3(fxz, 0.0f, 0.0f);
+			pVtx[6].pos = D3DXVECTOR3(-fxz, 0.0f, -fxz);
+			pVtx[7].pos = D3DXVECTOR3(0.0f, 0.0f, -fxz);
+			pVtx[8].pos = D3DXVECTOR3(fxz, 0.0f, -fxz);
 
 			//ñ@ê¸ÇÃê›íË
 			pVtx[nCntX].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);

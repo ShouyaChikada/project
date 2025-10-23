@@ -163,6 +163,7 @@
     </ClCompile>
     <ClCompile Include="player.cpp" />
     <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="rock.cpp" />
     <ClCompile Include="shadows.cpp" />
     <ClCompile Include="texturemanager.cpp" />
   </ItemGroup>
@@ -184,6 +185,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="rock.h" />
     <ClInclude Include="shadows.h" />
     <ClInclude Include="texturemanager.h" />
   </ItemGroup>

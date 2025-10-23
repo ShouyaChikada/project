@@ -9,6 +9,7 @@
 #include "manager.h"
 #include "texturemanager.h"
 
+
 //静的メンバ変数
 const char* CObjectX::m_txt = {};
 
@@ -29,6 +30,7 @@ CObjectX::CObjectX(int nPriolty):CObject(nPriolty)
 	m_pModel = NULL;
 	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_VecAxis = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	//m_pShadowS = nullptr;
 
 	//ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
@@ -48,19 +50,21 @@ CObjectX::~CObjectX()
 // 生成
 CObjectX* CObjectX::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, const char* txt)
 {
-	//int nNumAll = Getobject();
+	CObjectX* pObjectX = NULL;
+	pObjectX = new CObjectX;
 
-	//if (nNumAll < MAX_OBJECT - 1)
-	//{
-		CObjectX* pObjectX = NULL;
-		pObjectX = new CObjectX;
+	if (pObjectX != nullptr)
+	{
 		pObjectX->m_pos = pos;
 		pObjectX->m_rot = D3DXToRadian(rot);
 		pObjectX->m_txt = txt;
 		pObjectX->Init();
 		return pObjectX;
-	//}
-	//return NULL;
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 //================================
@@ -84,8 +88,6 @@ HRESULT CObjectX::Init(void)
 		&m_dwNumMat,
 		&m_pMesh);
 
-	m_fValueRot = 0.01f;
-
 	D3DXMATERIAL *pMat = nullptr;	//マテリアルへのポインタ
 
 	//マテリアルデータへのポインタを取得
@@ -98,7 +100,7 @@ HRESULT CObjectX::Init(void)
 				//テクスチャの読み込み
 			//	D3DXCreateTextureFromFile(pDevice,
 			//		pMat[nCntMat].pTextureFilename,
-			//		&m_pTexture[nCntMat]);
+			//		&m_pTexture[nCntMat]);)
 			m_nIdx[nCntMat] = pTex->Register(pMat[nCntMat].pTextureFilename);
 		}
 	}
@@ -184,6 +186,7 @@ void CObjectX::Update(void)
 	//前回の位置を保存	位置更新の上で書く
 	m_posOld = m_pos;
 
+	//m_pShadowS->SetShadow(m_pos, m_rot);
 
 	m_pos += m_move;
 
@@ -212,15 +215,12 @@ void CObjectX::Draw(void)
 	D3DMATERIAL9 matDef;								// 現在のマテリアル保存用
 	D3DXMATERIAL* pMat;									// マテリアルデータへのポインタ
 	D3DXQUATERNION quat;								// クォータニオン
-	D3DXVECTOR3 vecAxis = D3DXVECTOR3(0.0f,1.0f,0.0f);	// 回転軸
-	float fValueRot = 0.0f;								// 回転角(回転量)
-	fValueRot = D3DX_PI * 0.001f;
 
 	//ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
 	// 回転軸のおける指定の回転角からクォータニオンを作成
-	D3DXQuaternionRotationAxis(&quat, &vecAxis, fValueRot);
+	D3DXQuaternionRotationAxis(&quat, &m_VecAxis, m_fValueRot);
 
 	// クォータニオンから回転マトリックスの作成
 	D3DXMatrixRotationQuaternion(&mtxRot, &quat);
@@ -259,6 +259,7 @@ void CObjectX::Draw(void)
 		//モデル(パーツ)の描画
 		m_pMesh->DrawSubset(nCntMat);
 	}
+	
 	//保存していたマテリアルを隠す
 	pDevice->SetMaterial(&matDef);
 }
@@ -273,9 +274,12 @@ LPD3DXMESH CObjectX::GetMesh(void)
 //============================
 void CObjectX::SetInput(void)
 {
-	//D3DXVec3Cross();
 	// キーボード
 	CInputKeyboard* pInputKeyboard = CManager::GetKeyboard();
+
+	D3DXVECTOR3 move = D3DXVECTOR3(0.0f,0.0f,0.0f);
+
+	D3DXVECTOR3 vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
 	//カメラの情報取得
 	CCamera* pCamera = CManager::GetCamera();
@@ -286,6 +290,7 @@ void CObjectX::SetInput(void)
 	//左移動
 	if (pInputKeyboard->GetPress(DIK_A) == true)
 	{
+		m_fValueRot = MAX_ROT;
 
 		//前移動
 		if (pInputKeyboard->GetPress(DIK_W) == true)
@@ -317,6 +322,8 @@ void CObjectX::SetInput(void)
 	//右移動
 	if (pInputKeyboard->GetPress(DIK_D) == true)
 	{
+		m_fValueRot = MAX_ROT;
+
 		//前移動
 		if (pInputKeyboard->GetPress(DIK_W) == true)
 		{
@@ -342,6 +349,7 @@ void CObjectX::SetInput(void)
 	//前移動
 	if (pInputKeyboard->GetPress(DIK_W) == true)
 	{
+		m_fValueRot = MAX_ROT;
 
 		if (pInputKeyboard->GetPress(DIK_D) == true)
 		{
@@ -364,6 +372,7 @@ void CObjectX::SetInput(void)
 	//後ろ移動
 	if (pInputKeyboard->GetPress(DIK_S) == true)
 	{
+		m_fValueRot = MAX_ROT;
 
 		if (pInputKeyboard->GetPress(DIK_D) == true)
 		{
@@ -384,4 +393,19 @@ void CObjectX::SetInput(void)
 
 		}
 	}
+
+	if ((pInputKeyboard->GetPress(DIK_W) == false) &&
+		(pInputKeyboard->GetPress(DIK_A) == false) &&
+		(pInputKeyboard->GetPress(DIK_S) == false) &&
+		(pInputKeyboard->GetPress(DIK_D) == false))
+	{
+		m_fValueRot = 0.0f;
+	}
+
+	// 進行ベクトル
+	D3DXVec3Normalize(&move, &m_move);
+
+	// 外積
+	D3DXVec3Cross(&m_VecAxis, &vecU, &move);
+
 }

@@ -1,2 +1,11 @@
-﻿  objectx.cpp
+﻿  camera.cpp
+  jimen.cpp
+  manager.cpp
+  model.cpp
+  objectx.cpp
+  player.cpp
+  renderer.cpp
+  shadows.cpp
+  texturemanager.cpp
+  コードを生成中...
   Personal production.vcxproj -> C:\Users\student\source\repos\Personal production\Debug\Personal production.exe

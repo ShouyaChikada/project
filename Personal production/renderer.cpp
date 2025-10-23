@@ -296,7 +296,7 @@ void CRenderer::Draw(void)
 	//バックバッファ
 	m_pD3DDevice->Clear(0, NULL,
 		(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL),
-		D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+		D3DCOLOR_RGBA(128, 154, 255, 255), 1.0f, 0);
 
 	//D3DXVECTOR3 posV = pCamera->GetPosV();
 	//D3DXVECTOR3 posR = pCamera->GetPosR();

@@ -74,6 +74,7 @@ HRESULT CTextureManager::Load()
 		"data\\TEXTURE\\result.jpg",				//	32
 		"data\\TEXTURE\\tutorial.jpg",
 		"data\\TEXTURE\\rock000.jpg",
+		"data\\TEXTURE\\earth000.jpg",
 		//------------------------------------			
 	};											  
 

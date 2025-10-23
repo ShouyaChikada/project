@@ -13,7 +13,8 @@
 #include "model.h"
 
 #define MAX_LOAD (128)
-#define MAX_SPEED (3.0f)
+#define MAX_SPEED (4.0f)
+#define MAX_ROT (0.175f)
 
 class CObjectX :public CObject
 {
@@ -38,23 +39,24 @@ public:
 	//bool Collision(D3DXVECTOR3 pos, D3DXVECTOR3 posOld, D3DXVECTOR3 move);
 private:
 	LPDIRECT3DTEXTURE9 m_pTexture[MAX_TEXTURE];	// テクスチャのポインタ
-	LPD3DXMESH m_pMesh;		// メッシュのポインタ
-	LPD3DXBUFFER m_pBuffMat;	// マテリアルのポインタ
-	DWORD m_dwNumMat;			// マテリアル数
-	D3DXMATRIX m_mtxWorld;	// ワールドマトリックス
-	D3DXMATRIX m_mtxRot;	// ワールドマトリックス
-	D3DXVECTOR3 m_SetPosition;			//位置
-	D3DXVECTOR3 m_rot;
-	D3DXVECTOR3 m_rotDest;
-    D3DXVECTOR3 m_pos;
-	D3DXVECTOR3 m_posOld;
-	D3DXVECTOR3 m_move;
-	D3DXVECTOR3 m_VecAxis;		// 回転軸
-	float m_fValueRot;			// 回転角(回転量)
-	CModel* m_pModel;
-	static const char* m_txt;
-	int m_nIdx[MAX_LOAD];
-	float m_Diff;
+	LPD3DXMESH m_pMesh;							// メッシュのポインタ
+	LPD3DXBUFFER m_pBuffMat;					// マテリアルのポインタ
+	DWORD m_dwNumMat;							// マテリアル数
+	D3DXMATRIX m_mtxWorld;						// ワールドマトリックス
+	D3DXMATRIX m_mtxRot;						// ワールドマトリックス
+	D3DXVECTOR3 m_SetPosition;					// 位置
+	D3DXVECTOR3 m_rot;							// 向き
+	D3DXVECTOR3 m_rotDest;						// 目的の向き
+    D3DXVECTOR3 m_pos;							// 位置
+	D3DXVECTOR3 m_posOld;						// 目的の位置
+	D3DXVECTOR3 m_move;							// 移動量
+	D3DXVECTOR3 m_VecAxis;						// 回転軸
+	float m_fValueRot;							// 回転角(回転量)
+	CModel* m_pModel;							// モデルのポインタ
+	//CShadowS* m_pShadowS;						// シャドウのポインタ
+	static const char* m_txt;					// テキスト
+	int m_nIdx[MAX_LOAD];						// インデックス
+	float m_Diff;								// 差分
 
 };
 #endif
